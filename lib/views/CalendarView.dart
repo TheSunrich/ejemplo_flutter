@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_calendar/flutter_advanced_calendar.dart';
+//import 'package:flutter_advanced_calendar/flutter_advanced_calendar.dart';
 
 class CalendarView extends StatefulWidget {
   const CalendarView({super.key});
@@ -9,7 +9,9 @@ class CalendarView extends StatefulWidget {
 }
 
 class _CalendarViewState extends State<CalendarView> {
-  final _calendarControllerToday = AdvancedCalendarController.today();
+  //final _calendarControllerToday = AdvancedCalendarController.today();
+
+  DateTime setDate = DateTime.now();
 
   final List<DateTime> events = [
     DateTime.now(),
@@ -29,7 +31,14 @@ class _CalendarViewState extends State<CalendarView> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AdvancedCalendar(
+              CalendarDatePicker(
+
+                  initialDate: setDate,
+                  firstDate: DateTime.now().subtract(const Duration(days: 730)),
+                  lastDate: DateTime.now().add(const Duration(days: 730)),
+                  onDateChanged: (DateTime value) => {},
+              ),
+              /*AdvancedCalendar(
                 controller: _calendarControllerToday,
                 events: events,
                 preloadMonthViewAmount: 25,
@@ -38,7 +47,7 @@ class _CalendarViewState extends State<CalendarView> {
                 headerStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
-              ),
+              ),*/
               /*Theme(
                 data: ThemeData.light().copyWith(
                   textTheme: ThemeData.light().textTheme.copyWith(

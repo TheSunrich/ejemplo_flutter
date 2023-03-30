@@ -1,0 +1,42 @@
+{
+  "language": "English",
+  "@language": {
+    "description": "The current Language"
+  },
+  "button1": "Dropdown",
+  "@button1": {
+    "description": "That's the button "
+  },
+  "button2": "Skeleton",
+  "@button2": {
+    "description": "That's the button "
+  },
+  "button3": "Request",
+  "@button3": {
+    "description": "That's the button "
+  },
+  "button4": "Swipe",
+  "@button4": {
+    "description": "That's the button "
+  },
+  "button5": "Chip",
+  "@button5": {
+    "description": "That's the button "
+  },
+  "button6": "Signature",
+  "@button6": {
+    "description": "That's the button "
+  },
+  "button7": "Zoom",
+  "@button7": {
+    "description": "That's the button "
+  },
+  "button8": "Loading",
+  "@button8": {
+    "description": "That's the button "
+  },
+  "button9": "Calendar",
+  "@button9": {
+    "description": "That's the button "
+  }
+}

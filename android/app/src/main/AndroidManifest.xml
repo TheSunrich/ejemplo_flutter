@@ -1,5 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dappis.ejemplo.flutter.ejemplo_flutter">
+
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+
     <application
         android:label="ejemplo_flutter"
         android:name="${applicationName}"
@@ -7,6 +19,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:showOnLockScreen="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

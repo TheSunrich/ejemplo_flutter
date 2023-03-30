@@ -1,5 +1,4 @@
 import 'package:ejemplo_flutter/views/LoaderView.dart';
-import 'package:ejemplo_flutter/views/MainView.dart';
 import 'package:ejemplo_flutter/views/CalendarView.dart';
 import 'package:ejemplo_flutter/views/SignatureView.dart';
 import 'package:ejemplo_flutter/views/SkeletonView.dart';
@@ -9,6 +8,9 @@ import 'package:ejemplo_flutter/views/ChipView.dart';
 import 'package:ejemplo_flutter/views/ZoomView.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -24,6 +26,17 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('es'),
+        Locale('fr')
+      ],
       routes: {
         '/': (context) => const SplashScreen(),
         '/skeleton': (context) => const SkeletonView(),

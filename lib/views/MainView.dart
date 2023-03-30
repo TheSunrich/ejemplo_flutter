@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:ejemplo_flutter/MyApp.dart';
 import 'package:flutter/material.dart';
 import 'package:ejemplo_flutter/components/SimpleDialogItem/SimpleDialogItem.dart';
@@ -7,8 +9,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io' show Platform;
+
 class MainView extends StatefulWidget {
   const MainView({super.key});
+
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   State<MainView> createState() => _MainViewState();
@@ -39,6 +46,45 @@ class _MainViewState extends State<MainView> {
     fToast.init(navigatorKey.currentContext!);
   }
 
+  void send() async {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: -1,
+        channelKey: 'channel_key',
+        //Same as above in initilize,
+        title: 'title',
+        body: 'body',
+        wakeUpScreen: true,
+        fullScreenIntent: true,
+        criticalAlert: true,
+        actionType: ActionType.KeepOnTop,
+        autoDismissible: false,
+        displayOnBackground: true,
+        displayOnForeground: true,
+        locked: true,
+        category: NotificationCategory.Alarm,
+
+        //Other parameters
+      ),
+      actionButtons: <NotificationActionButton>[
+        NotificationActionButton(key: 'accept', label: 'Accept'),
+        NotificationActionButton(key: 'reject', label: 'Reject'),
+      ],
+
+    );
+    AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async {
+      print(receivedAction.buttonKeyPressed);
+    });
+    if (Platform.isAndroid) {
+      const AndroidIntent intent = AndroidIntent(
+        action: 'action_view',
+        data: 'https://play.google.com/store/apps/details?'
+            'id=com.google.android.apps.myapp',
+      );
+      await intent.launch();
+    }
+  }
+
   void showToast(String text, {required Color color, IconData? icon}) {
     fToast.showToast(
       child: Container(
@@ -65,11 +111,11 @@ class _MainViewState extends State<MainView> {
 
   ImageProvider setImageInCircle() {
     if (_image != null) return FileImage(File(_image!.path));
-    return const NetworkImage('https://cdn2.melodijolola.com/media/files/styles/nota_imagen/public/field/image/banff-4331689_1920.jpg');
+    return const NetworkImage(
+        'https://cdn2.melodijolola.com/media/files/styles/nota_imagen/public/field/image/banff-4331689_1920.jpg');
   }
 
-  Future openDialog(String text) =>
-      showDialog(
+  Future openDialog(String text) => showDialog(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
@@ -130,14 +176,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(
@@ -155,9 +195,7 @@ class _MainViewState extends State<MainView> {
                   PopupMenuButton(
                     position: PopupMenuPosition.under,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    onSelected: (value) => {
-                      getImage(value == 'camera')
-                    },
+                    onSelected: (value) => {getImage(value == 'camera')},
                     itemBuilder: (BuildContext context) {
                       return const [
                         PopupMenuItem(
@@ -218,14 +256,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.list_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.list_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button1)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/skeleton').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -242,13 +285,22 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.reorder_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.reorder_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button2)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () => _getRequest(),
+                          onPressed: () {
+                            send();
+                            _getRequest();
+                          },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(Colors.blue),
                             foregroundColor: MaterialStateProperty.all(Colors.white),
@@ -258,14 +310,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.wifi_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.wifi_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button3)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/swipe').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -282,14 +339,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.swipe_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.swipe_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button4)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/chip').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -306,14 +368,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.toggle_off_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.toggle_off_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button5)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/signature').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -330,14 +397,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.border_color_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.border_color_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button6)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/zoom').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -354,14 +426,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.zoom_out_map_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.zoom_out_map_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button7)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/loader').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -378,14 +455,19 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.refresh_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.refresh_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button8)
+                            ],
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () =>
-                          {
+                          onPressed: () => {
                             Navigator.pushNamed(context, '/calendar').then((result) {
                               setState(() {
                                 fToast = FToast();
@@ -402,9 +484,15 @@ class _MainViewState extends State<MainView> {
                               ),
                             ),
                           ),
-                          child: const Icon(
-                            Icons.calendar_month_rounded,
-                            size: 40,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.calendar_month_rounded,
+                                size: 40,
+                              ),
+                              Text(AppLocalizations.of(context)!.button9)
+                            ],
                           ),
                         ),
                       ],
