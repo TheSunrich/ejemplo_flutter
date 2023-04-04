@@ -1,84 +1,89 @@
+import 'dart:typed_data';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class PushNotificationService {
-
   static String? token;
 
+  static final FlutterLocalNotificationsPlugin notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   static Future initializeApp() async {
-
     await Firebase.initializeApp();
-    await AwesomeNotificationsFcm().initialize(
-        onFcmSilentDataHandle: mySilentDataHandle,
-        onFcmTokenHandle: myFcmTokenHandle,
-        onNativeTokenHandle: myNativeTokenHandle,
-        debug: true);
-    AwesomeNotifications().isNotificationAllowed().then(
-            (isAllowed) {
-          //It would be more appropriate if you can show your own dialog
-          //to the user before requesting the notifications permissons.
-          if (!isAllowed) {
-            AwesomeNotifications().requestPermissionToSendNotifications(
-              permissions: [
-                NotificationPermission.Alert,
-                NotificationPermission.Sound,
-                NotificationPermission.Badge,
-                NotificationPermission.Vibration,
-                NotificationPermission.Light,
-                NotificationPermission.FullScreenIntent,
-              ],
-            );
-          }
-        }
+    const initializationSettings = InitializationSettings(
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+      iOS: DarwinInitializationSettings()
     );
-    token = await getFirebaseMessagingToken();
-    print(token);
-  }
-
-  @pragma("vm:entry-point")
-  static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
-    print('"SilentData": ${silentData.toString()}');
-
-    if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
-      print("bg");
-    } else {
-      print("FOREGROUND");
-    }
-
-    print("starting long task");
-    await Future.delayed(Duration(seconds: 4));
-    final url = Uri.parse("http://google.com");
-    final re = await http.get(url);
-    print(re.body);
-    print("long task done");
-  }
-
-  /// Use this method to detect when a new fcm token is received
-  @pragma("vm:entry-point")
-  static Future<void> myFcmTokenHandle(String token) async {
-    print('FCM Token:"$token"');
-  }
-
-  /// Use this method to detect when a new native token is received
-  @pragma("vm:entry-point")
-  static Future<void> myNativeTokenHandle(String token) async {
-    print('Native Token:"$token"');
-  }
-
-  static Future<String> getFirebaseMessagingToken() async {
-    String firebaseAppToken = '';
-    if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
-      try {
-        firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    notificationsPlugin.initialize(initializationSettings);
+    FirebaseMessaging.onBackgroundMessage(backgroundMessage);
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        print("New notification");
       }
-      catch (exception){
-        print('$exception');
+    });
+    FirebaseMessaging.onMessage.listen((message) {
+      if (message.notification != null) {
+        print("OnMessage");
+        print(message.notification!.title);
+        print(message.notification!.body);
+        createNotification(message);
       }
-    } else {
-      print('Firebase is not available on this project');
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      if (message.notification != null) {
+        print("OnMessageOpenedApp");
+        print(message.notification!.title);
+        print(message.notification!.body);
+        createNotification(message);
+      }
+    });
+  }
+
+  static Future<void> backgroundMessage(RemoteMessage message) async {
+    if (message.notification != null) {
+      print("BackgroundMessage");
+      print(message.notification!.title);
+      print(message.notification!.body);
+      createNotification(message);
     }
-    return firebaseAppToken;
+  }
+  static void createNotification(RemoteMessage message) async {
+    try {
+      final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      NotificationDetails notificationDetails = NotificationDetails(
+          android: AndroidNotificationDetails(
+        "pushnotification",
+        "pushnotificationchannel",
+        importance: Importance.max,
+        priority: Priority.high,
+        actions: const [
+          AndroidNotificationAction('action_one', 'Action One'),
+          AndroidNotificationAction('action_two', 'Action Two')
+        ],
+        sound: const UriAndroidNotificationSound('https://www.myinstants.com/media/sounds/beeper_emergency_call.mp3'),
+        fullScreenIntent: true,
+        autoCancel: false,
+        ongoing: true,
+        playSound: true,
+        showWhen: true,
+        onlyAlertOnce: false,
+        vibrationPattern: Int64List.fromList([1000, 1500, 500, 2000]),
+        enableVibration: true,
+        category: AndroidNotificationCategory.alarm,
+
+      ));
+      await notificationsPlugin.show(
+        id,
+        message.notification!.title,
+        message.notification!.body,
+        notificationDetails,
+        payload: 'action_one',
+      );
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 }

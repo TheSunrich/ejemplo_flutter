@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:ejemplo_flutter/MyApp.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ejemplo_flutter/components/SimpleDialogItem/SimpleDialogItem.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -47,42 +47,7 @@ class _MainViewState extends State<MainView> {
   }
 
   void send() async {
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: -1,
-        channelKey: 'channel_key',
-        //Same as above in initilize,
-        title: 'title',
-        body: 'body',
-        wakeUpScreen: true,
-        fullScreenIntent: true,
-        criticalAlert: true,
-        actionType: ActionType.KeepOnTop,
-        autoDismissible: false,
-        displayOnBackground: true,
-        displayOnForeground: true,
-        locked: true,
-        category: NotificationCategory.Alarm,
 
-        //Other parameters
-      ),
-      actionButtons: <NotificationActionButton>[
-        NotificationActionButton(key: 'accept', label: 'Accept'),
-        NotificationActionButton(key: 'reject', label: 'Reject'),
-      ],
-
-    );
-    AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async {
-      print(receivedAction.buttonKeyPressed);
-    });
-    if (Platform.isAndroid) {
-      const AndroidIntent intent = AndroidIntent(
-        action: 'action_view',
-        data: 'https://play.google.com/store/apps/details?'
-            'id=com.google.android.apps.myapp',
-      );
-      await intent.launch();
-    }
   }
 
   void showToast(String text, {required Color color, IconData? icon}) {
